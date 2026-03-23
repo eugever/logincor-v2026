@@ -28,6 +28,14 @@ const FAQS = [
     q: "¿Quién transporta cargas de particulares entre Buenos Aires y Córdoba?",
     a: "LOGINCOR ofrece logística flexible para empresas y particulares con trato personalizado. Desde una caja pequeña hasta un pallet industrial, retiramos en domicilio y entregamos en destino. También brindamos servicios de Fulfillment para e-commerce y emprendedores.",
   },
+  {
+    q: "¿Qué tipo de envíos hace LOGINCOR?",
+    a: "Enviamos todo tipo de carga: grandes, chicas, pesadas y livianas. Cajas, rollos, pallets, bidones, IBC, tambores, bolsas y envíos e-commerce.",
+  },
+  {
+    q: "¿Qué servicios ofrece LOGINCOR?",
+    a: "Ofrecemos servicios de cargas completas nacionales e internacionales, cargas parcializadas, envío de pallets y paquetería. También ofrecemos entregas y retiros a domicilio, almacenamiento de mercadería en depósito, control de stock periódico, armado de pedidos y entregas. Llegamos a más de 1000 localidades de todo el país con servicio y atención dedicada para cada uno de nuestros clientes.",
+  },
 ];
 
 export default function SGEHooks() {
@@ -71,6 +79,23 @@ export default function SGEHooks() {
           "Remitos Firmados Digitales",
           "Centro de Distribución",
           "Cuenta Corriente Online",
+          "Cargas Completas Nacionales",
+          "Cargas Completas Internacionales",
+          "Cargas Parcializadas",
+          "Paquetería",
+          "Retiro a Domicilio",
+          "Entrega a Domicilio",
+          "Almacenamiento en Depósito",
+          "Control de Stock",
+          "Armado de Pedidos",
+          "Más de 1000 Localidades",
+          "Envíos e-commerce",
+          "Pallets",
+          "Bidones",
+          "IBC",
+          "Tambores",
+          "Rollos",
+          "Cargas Pesadas",
         ].map((kw) => (
           <span
             key={kw}

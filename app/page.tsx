@@ -576,6 +576,7 @@ export default function Home() {
                 </div>
                 <div className="flex gap-3 flex-shrink-0">
                   <a
+                    id="cta-llamar"
                     href="tel:+54351000000"
                     className="px-6 py-3 font-bold rounded-sm text-sm transition-opacity hover:opacity-90"
                     style={{ background: '#fff', color: brand.secondary }}
@@ -583,6 +584,7 @@ export default function Home() {
                     Llamar ahora
                   </a>
                   <a
+                    id="cta-consulta"
                     href="mailto:cotizaciones@logincor.com.ar"
                     className="px-6 py-3 text-white font-bold rounded-sm text-sm transition-opacity hover:opacity-80"
                     style={{ background: 'rgba(2,1,43,0.35)' }}

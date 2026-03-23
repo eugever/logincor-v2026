@@ -41,6 +41,12 @@ export default function CotizarModal({ localidad, salidas, entrega, onClose }: P
   );
 
   const sendWhatsApp = () => {
+    // Conversión en los tres sistemas de medición
+    if (typeof window !== "undefined") {
+      if ((window as any).gtag)  (window as any).gtag("event", "conversion", { send_to: "AW-11470719177" });
+      if ((window as any).fbq)   (window as any).fbq("track", "Lead");
+      if ((window as any).ttq)   (window as any).ttq.track("Contact");
+    }
     const msg = [
       `🚚 *Solicitud de cotización — LOGINCOR*`,
       ``,

@@ -10,6 +10,7 @@ import {
 } from "react-simple-maps";
 import { geoCentroid } from "d3-geo";
 import CotizarModal from "./CotizarModal";
+import { track } from "@/app/lib/tracking";
 
 const GEO_URL = "/argentina-provinces.json";
 
@@ -141,6 +142,7 @@ export default function ArgentinaMap() {
                         onClick={() => {
                           if (hasLocalities) {
                             setClicked(name === clickedProvince ? null : name);
+                            track("MapInteraction");
                           }
                         }}
                         onMouseEnter={(e) => {
@@ -294,7 +296,7 @@ export default function ArgentinaMap() {
                 {localities.map((loc, i) => (
                   <button
                     key={loc.name}
-                    onClick={() => setSelected(loc)}
+                    onClick={() => { setSelected(loc); track("ViewLocation"); }}
                     className="flex items-center justify-between px-4 py-3 text-left hover:bg-white/5 transition-colors group"
                     style={{ borderTop: i > 0 ? "1px solid rgba(255,255,255,0.06)" : undefined }}
                   >
