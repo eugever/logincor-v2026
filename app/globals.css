@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+
+:root {
+  --background: #02012B;
+  --foreground: #fafafa;
+  --color-primary: #02012B;
+  --color-secondary: #E94E1B;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.bento-card {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.bento-card:hover {
+  border-color: rgba(233, 78, 27, 0.45);
+  transform: translateY(-2px);
+}
+
+.font-brand {
+  font-family: var(--font-eurostar), sans-serif;
+}
+
+.grid-texture {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
