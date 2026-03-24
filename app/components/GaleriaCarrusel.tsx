@@ -23,7 +23,7 @@ const SLIDES = [
     caption: "Depósito en Córdoba con control de stock, armado de pedidos y despacho directo.",
   },
   {
-    src: "https://images.unsplash.com/photo-1580674684081-7617fbf3d745?w=1400&q=80&auto=format&fit=crop",
+    src: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1400&q=80&auto=format&fit=crop",
     alt: "Rastreo satelital GPS en tiempo real de la flota LOGINCOR",
     label: "Rastreo Satelital",
     caption: "Seguimiento GPS en tiempo real. Sabés dónde está tu carga en todo momento.",

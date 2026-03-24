@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   ComposableMap,
   Geographies,
@@ -11,44 +12,11 @@ import {
 import { geoCentroid } from "d3-geo";
 import CotizarModal from "./CotizarModal";
 import { track } from "@/app/lib/tracking";
+import { Locality, COVERED_PROVINCES, PROVINCE_LOCALITIES } from "@/app/lib/localities";
+export type { Locality };
 
 const GEO_URL = "/argentina-provinces.json";
 
-const COVERED_PROVINCES = new Set([
-  "San Juan", "Mendoza", "San Luis", "Catamarca", "La Rioja",
-  "Santiago del Estero", "Tucumán", "Salta", "Jujuy", "Santa Fe",
-  "Chaco", "Formosa", "Corrientes", "Misiones", "Buenos Aires",
-  "Ciudad de Buenos Aires", "La Pampa", "Neuquén", "Río Negro", "Córdoba",
-  "Tierra del Fuego",
-]);
-
-export interface Locality {
-  name: string;
-  coords: [number, number];
-  salidas: string;
-  entrega: string;
-}
-
-const PROVINCE_LOCALITIES: Record<string, Locality[]> = {
-  "La Rioja": [
-    { name: "La Rioja Capital", coords: [-66.856, -29.413], salidas: "Lunes a viernes", entrega: "48hs hábiles" },
-    { name: "Chilecito",        coords: [-67.497, -29.167], salidas: "Lunes a viernes", entrega: "48hs hábiles" },
-    { name: "Chamical",         coords: [-66.315, -30.358], salidas: "Lunes a viernes", entrega: "48hs hábiles" },
-  ],
-  "Córdoba": [
-    { name: "Villa María",   coords: [-63.239, -32.410], salidas: "Lunes, miércoles y viernes", entrega: "72hs hábiles" },
-    { name: "Villa Nueva",   coords: [-63.245, -32.424], salidas: "Lunes, miércoles y viernes", entrega: "72hs hábiles" },
-    { name: "Bell Ville",    coords: [-62.686, -32.630], salidas: "Lunes, miércoles y viernes", entrega: "72hs hábiles" },
-    { name: "Marcos Juárez", coords: [-62.098, -32.697], salidas: "Lunes, miércoles y viernes", entrega: "72hs hábiles" },
-  ],
-  "Santa Fe": [
-    { name: "Rosario",          coords: [-60.650, -32.944], salidas: "Lunes, miércoles y viernes", entrega: "72hs hábiles" },
-    { name: "Santa Fe Capital", coords: [-60.700, -31.633], salidas: "Lunes, miércoles y viernes", entrega: "72hs hábiles" },
-  ],
-  "Tierra del Fuego": [
-    { name: "Ushuaia", coords: [-68.300, -54.800], salidas: "Lunes a viernes", entrega: "Hasta 12 días hábiles*" },
-  ],
-};
 
 const CORDOBA_COORDS: [number, number] = [-64.22, -31.42];
 const MALVINAS_COORDS: [number, number] = [-59.5, -51.7];
@@ -67,8 +35,8 @@ const LABEL_OFFSETS: Record<string, [number, number]> = {
 
 const STATS = [
   { value: "+1.000", label: "Localidades cubiertas" },
-  { value: "19",     label: "Provincias" },
-  { value: "24hs",   label: "Entrega CBA–BSAS" },
+  { value: "22",     label: "Provincias" },
+  { value: "24hs",   label: "Entrega Córdoba–Buenos Aires" },
   { value: "98%",    label: "On-time delivery" },
 ];
 
@@ -78,6 +46,9 @@ export default function ArgentinaMap() {
   const [tooltipPos, setTooltipPos]       = useState({ x: 0, y: 0 });
   const [clickedProvince, setClicked]     = useState<string | null>(null);
   const [selectedLocalidad, setSelected]  = useState<Locality | null>(null);
+  const [locTooltipPos, setLocTooltipPos] = useState<{ x: number; y: number } | null>(null);
+  const [mounted, setMounted]             = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const localities = clickedProvince ? (PROVINCE_LOCALITIES[clickedProvince] ?? []) : [];
 
@@ -92,14 +63,43 @@ export default function ArgentinaMap() {
         />
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-6" onClick={(e) => {
-        // click fuera del mapa cierra la selección
-        if ((e.target as HTMLElement).tagName === "svg") setClicked(null);
-      }}>
+      {/* Tooltip localidades — portal al body para evitar clipping por transforms */}
+      {mounted && locTooltipPos && createPortal(
+        <div
+          className="pointer-events-none px-3 py-1.5 rounded-lg text-xs font-bold text-white"
+          style={{
+            position: "fixed",
+            left: locTooltipPos.x,
+            top: locTooltipPos.y - 44,
+            transform: "translateX(-50%)",
+            background: "#E94E1B",
+            boxShadow: "0 0 20px rgba(233,78,27,0.8)",
+            whiteSpace: "nowrap",
+            zIndex: 9999,
+          }}
+        >
+          Hacé clic para cotizar tu envío
+        </div>,
+        document.body
+      )}
+
+      {/* Contenedor principal con borde compartido */}
+      <div
+        className="flex flex-col lg:flex-row"
+        style={{
+          border: "1px solid rgba(233,78,27,0.35)",
+          borderRadius: "12px",
+          overflow: "hidden",
+          background: "rgba(255,255,255,0.03)",
+        }}
+        onClick={(e) => {
+          if ((e.target as HTMLElement).tagName === "svg") setClicked(null);
+        }}
+      >
 
         {/* Map */}
         <div
-          className="relative"
+          className="relative w-full lg:w-[700px] lg:flex-shrink-0 lg:flex-grow-0"
           onMouseEnter={() => { mapActiveRef.current = true; }}
           onMouseLeave={() => { mapActiveRef.current = false; }}
         >
@@ -123,7 +123,7 @@ export default function ArgentinaMap() {
             projectionConfig={{ scale: 600, center: [-65, -37] }}
             width={500}
             height={620}
-            style={{ width: "100%", height: "auto" }}
+            style={{ width: "100%", height: "auto", display: "block" }}
           >
             <ZoomableGroup zoom={1} minZoom={1} maxZoom={5} filterZoomEvent={() => mapActiveRef.current}>
               <Geographies geography={GEO_URL}>
@@ -256,17 +256,11 @@ export default function ArgentinaMap() {
                 <circle r={12} fill="rgba(255,255,255,0.1)" />
               </Marker>
 
-              {/* Province localities (shown on hover) */}
-              {localities.map((loc) => (
-                <Marker key={loc.name} coordinates={loc.coords}>
-                  <circle r={3} fill="#fff" stroke="#E94E1B" strokeWidth={1.2} />
-                </Marker>
-              ))}
             </ZoomableGroup>
           </ComposableMap>
 
           {/* Legend */}
-          <div className="flex flex-wrap gap-3 mt-2">
+          <div className="flex flex-wrap gap-3 px-4 py-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm" style={{ background: "#E94E1B" }} />
               <span className="text-xs text-zinc-400">Casa Central</span>
@@ -279,44 +273,67 @@ export default function ArgentinaMap() {
               <div className="w-3 h-3 rounded-sm" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)" }} />
               <span className="text-xs text-zinc-400">Sin cobertura</span>
             </div>
-            <span className="text-xs text-zinc-600 font-mono hidden sm:inline">· scroll/drag para navegar</span>
           </div>
         </div>
 
+        {/* Divider: horizontal en mobile, vertical en desktop */}
+        <div className="hidden lg:block" style={{ width: "1px", background: "rgba(233,78,27,0.2)", flexShrink: 0 }} />
+        <div className="block lg:hidden" style={{ height: "1px", background: "rgba(233,78,27,0.2)" }} />
+
         {/* Side panel */}
-        <div className="flex flex-col gap-3">
+        <div
+          className="w-full lg:flex-1"
+          style={{ minWidth: 0, display: "flex", flexDirection: "column", alignSelf: "flex-start" }}
+        >
           {clickedProvince && localities.length > 0 ? (
-            /* Localities list */
-            <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(233,78,27,0.35)" }}>
+            <>
+              {/* Header */}
               <div className="px-4 py-3" style={{ background: "rgba(233,78,27,0.15)", borderBottom: "1px solid rgba(233,78,27,0.25)" }}>
                 <p className="text-xs font-mono uppercase tracking-widest text-zinc-400">Localidades</p>
                 <p className="text-white font-bold text-sm">{clickedProvince}</p>
               </div>
-              <div className="flex flex-col" style={{ background: "rgba(255,255,255,0.03)" }}>
-                {localities.map((loc, i) => (
+              {/* List con scroll */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: localities.length > 6 ? "1fr 1fr" : "1fr",
+                  overflowY: "auto",
+                  maxHeight: "60vh",
+                }}
+              >
+                {localities.map((loc, i) => {
+                  const cols = localities.length > 6 ? 2 : 1;
+                  return (
                   <button
                     key={loc.name}
                     onClick={() => { setSelected(loc); track("ViewLocation"); }}
-                    className="flex items-center justify-between px-4 py-3 text-left hover:bg-white/5 transition-colors group"
-                    style={{ borderTop: i > 0 ? "1px solid rgba(255,255,255,0.06)" : undefined }}
+                    onMouseEnter={(e) => setLocTooltipPos({ x: e.clientX, y: e.clientY })}
+                    onMouseMove={(e) => setLocTooltipPos({ x: e.clientX, y: e.clientY })}
+                    onMouseLeave={() => setLocTooltipPos(null)}
+                    className="flex items-center justify-between px-3 py-2.5 text-left hover:bg-white/5 transition-colors group"
+                    style={{
+                      borderTop: i >= cols ? "1px solid rgba(255,255,255,0.06)" : undefined,
+                      borderLeft: cols === 2 && i % 2 === 1 ? "1px solid rgba(255,255,255,0.06)" : undefined,
+                    }}
                   >
-                    <div>
-                      <div className="text-white text-sm font-medium group-hover:text-orange-400 transition-colors">{loc.name}</div>
-                      <div className="text-zinc-500 text-xs font-mono">{loc.entrega} · {loc.salidas}</div>
+                    <div className="min-w-0">
+                      <div className="text-white text-sm font-medium group-hover:text-orange-400 transition-colors truncate">{loc.name}</div>
                     </div>
-                    <svg className="w-4 h-4 text-zinc-600 group-hover:text-orange-400 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3 h-3 text-zinc-600 group-hover:text-orange-400 transition-colors flex-shrink-0 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
-                ))}
+                  );
+                })}
               </div>
-              <div className="px-4 py-2" style={{ background: "rgba(255,255,255,0.03)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                <p className="text-zinc-600 text-xs">Hacé clic en una localidad para cotizar</p>
+              {/* Footer */}
+              <div className="px-4 py-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", flexShrink: 0 }}>
+                <p className="text-zinc-500 text-xs">Hacé clic en una localidad para cotizar</p>
               </div>
-            </div>
+            </>
           ) : (
             /* Default stats */
-            <>
+            <div className="flex flex-col gap-3 p-4">
               {STATS.map((s) => (
                 <div
                   key={s.label}
@@ -339,7 +356,7 @@ export default function ArgentinaMap() {
                   Cotizar →
                 </a>
               </div>
-            </>
+            </div>
           )}
         </div>
 

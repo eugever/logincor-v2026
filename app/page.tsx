@@ -4,6 +4,7 @@ import GaleriaCarrusel from "./components/GaleriaCarrusel";
 import SGEHooks from "./components/SGEHooks";
 import SucursalMap from "./components/SucursalMap";
 import ArgentinaMapWrapper from "./components/ArgentinaMapWrapper";
+import { PROVINCE_LOCALITIES } from "@/app/lib/localities";
 
 const sucursales = [
   {
@@ -97,12 +98,9 @@ const jsonLd = {
           closes: "12:00",
         },
       ],
-      areaServed: [
-        { "@type": "City", name: "Buenos Aires", addressCountry: "AR" },
-        { "@type": "City", name: "Córdoba", addressCountry: "AR" },
-        { "@type": "City", name: "Rosario", addressCountry: "AR" },
-        { "@type": "AdministrativeArea", name: "Argentina" },
-      ],
+      areaServed: Object.entries(PROVINCE_LOCALITIES).flatMap(([province, locs]) =>
+        locs.map(loc => ({ "@type": "City", name: loc.name, addressRegion: province, addressCountry: "AR" }))
+      ),
       serviceType: [
         "Transporte de cargas",
         "Logística industrial",
@@ -142,7 +140,7 @@ const jsonLd = {
     },
     {
       "@type": "LocalBusiness",
-      "@id": "https://logincor.com.ar/#sucursal-bsas",
+      "@id": "https://logincor.com.ar/#sucursal-buenos-aires",
       name: "LOGINCOR — Depósito Buenos Aires",
       parentOrganization: { "@id": "https://logincor.com.ar/#organization" },
       address: {
@@ -297,8 +295,8 @@ export default function Home() {
               <Image
                 src="/logo.svg"
                 alt="Logincor - Transporte y Logística Industrial"
-                width={180}
-                height={41}
+                width={220}
+                height={50}
                 priority
               />
             </div>
@@ -344,7 +342,7 @@ export default function Home() {
             >
               <span className="w-2 h-2 rounded-full animate-pulse-slow" style={{ background: brand.secondary }} />
               <span className="text-xs font-mono uppercase tracking-widest" style={{ color: brand.secondary }}>
-                Flota activa · BSAS — CBA
+                Flota activa · Buenos Aires — Córdoba
               </span>
             </div>
             <h1 className="font-brand text-5xl md:text-7xl font-black tracking-tight text-white leading-none mb-6">
@@ -403,10 +401,11 @@ export default function Home() {
                   Envíos <span style={{ color: brand.secondary }}>24hs</span>
                 </h2>
                 <p className="text-zinc-400 text-lg mb-6 max-w-md">
-                  BSAS → CBA en 24hs. Retiro en puerta para e-commerce, particulares y empresas.
+                  Buenos Aires → Córdoba en 24hs. Retiro en puerta para e-commerce, particulares y empresas.
                 </p>
                 <div className="flex flex-wrap gap-3 mt-auto">
-                  <span className="px-3 py-1 rounded-full text-xs text-zinc-300 font-mono" style={{ background: 'rgba(255,255,255,0.08)' }}>BSAS → CBA</span>
+                  <span className="px-3 py-1 rounded-full text-xs text-zinc-300 font-mono" style={{ background: 'rgba(255,255,255,0.08)' }}>Buenos Aires → Córdoba</span>
+                  <span className="px-3 py-1 rounded-full text-xs text-zinc-300 font-mono" style={{ background: 'rgba(255,255,255,0.08)' }}>Salidas diarias</span>
                   <span className="px-3 py-1 rounded-full text-xs text-zinc-300 font-mono" style={{ background: 'rgba(255,255,255,0.08)' }}>Puerta a puerta</span>
                   <span className="px-3 py-1 rounded-full text-xs text-zinc-300 font-mono" style={{ background: 'rgba(255,255,255,0.08)' }}>Carga asegurada</span>
                 </div>
@@ -546,7 +545,7 @@ export default function Home() {
                 <div className="grid grid-cols-3 gap-6">
                   <div>
                     <div className="text-4xl font-black mb-1" style={{ color: brand.secondary }}>+800km</div>
-                    <div className="text-sm text-zinc-400">Corredor principal BSAS-CBA</div>
+                    <div className="text-sm text-zinc-400">Corredor principal Buenos Aires-Córdoba</div>
                   </div>
                   <div>
                     <div className="text-4xl font-black text-white mb-1">24hs</div>
@@ -606,7 +605,7 @@ export default function Home() {
             </p>
             <h2 className="font-brand text-4xl font-black text-white mb-2">Cobertura Nacional</h2>
             <p className="text-zinc-400 max-w-xl">
-              Desde Buenos Aires llegamos a más de <span className="text-white font-semibold">1.000 localidades</span> en 19 provincias de Argentina.
+              Desde Córdoba llegamos a más de <span className="text-white font-semibold">1.000 localidades</span> en 22 provincias de Argentina.
             </p>
           </div>
           <div
@@ -696,10 +695,18 @@ export default function Home() {
           <GaleriaCarrusel />
         </section>
 
-        <footer className="px-6 py-8 mt-16" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
-            <span>© 2026 LOGINCOR · Transporte y Logística Industrial</span>
-            <span className="font-mono">BSAS — CBA · Argentina</span>
+        <footer className="px-6 py-12 mt-16" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="max-w-7xl mx-auto flex flex-col items-center gap-6">
+            <Image
+              src="/logo.svg"
+              alt="Logincor - Transporte y Logística Industrial"
+              width={160}
+              height={36}
+            />
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-500 w-full">
+              <span>© 2026 LOGINCOR · Transporte y Logística Industrial</span>
+              <span className="font-mono">Buenos Aires — Córdoba · Argentina</span>
+            </div>
           </div>
         </footer>
       </div>
