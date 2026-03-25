@@ -92,7 +92,7 @@ export default function ArgentinaMap() {
           overflow: "hidden",
           background: "rgba(255,255,255,0.03)",
         }}
-        onClick={(e) => {
+        onClick={(e: React.MouseEvent) => {
           if ((e.target as HTMLElement).tagName === "svg") setClicked(null);
         }}
       >
@@ -145,14 +145,14 @@ export default function ArgentinaMap() {
                             track("MapInteraction");
                           }
                         }}
-                        onMouseEnter={(e) => {
+                        onMouseEnter={(e: React.MouseEvent) => {
                           const label = hasLocalities
                             ? `${name} — hacé clic para ver localidades`
                             : isCovered ? name : `${name} — sin cobertura`;
                           setTooltip(label);
                           setTooltipPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
                         }}
-                        onMouseMove={(e) => {
+                        onMouseMove={(e: React.MouseEvent) => {
                           setTooltipPos({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
                         }}
                         onMouseLeave={() => {
@@ -307,8 +307,8 @@ export default function ArgentinaMap() {
                   <button
                     key={loc.name}
                     onClick={() => { setSelected(loc); track("ViewLocation"); }}
-                    onMouseEnter={(e) => setLocTooltipPos({ x: e.clientX, y: e.clientY })}
-                    onMouseMove={(e) => setLocTooltipPos({ x: e.clientX, y: e.clientY })}
+                    onMouseEnter={(e: React.MouseEvent) => setLocTooltipPos({ x: e.clientX, y: e.clientY })}
+                    onMouseMove={(e: React.MouseEvent) => setLocTooltipPos({ x: e.clientX, y: e.clientY })}
                     onMouseLeave={() => setLocTooltipPos(null)}
                     className="flex items-center justify-between px-3 py-2.5 text-left hover:bg-white/5 transition-colors group"
                     style={{
