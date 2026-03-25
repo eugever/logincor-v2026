@@ -127,7 +127,7 @@ export default function ArgentinaMap() {
           >
             <ZoomableGroup zoom={1} minZoom={1} maxZoom={5} filterZoomEvent={() => mapActiveRef.current}>
               <Geographies geography={GEO_URL}>
-                {({ geographies }) =>
+                {({ geographies }: { geographies: any[] }) =>
                   geographies.map((geo) => {
                     const name: string = geo.properties.NAME_1;
                     const isCordoba  = name === "Córdoba";
@@ -192,7 +192,7 @@ export default function ArgentinaMap() {
 
               {/* Province name labels */}
               <Geographies geography={GEO_URL}>
-                {({ geographies }) =>
+                {({ geographies }: { geographies: any[] }) =>
                   geographies.map((geo) => {
                     const name: string = geo.properties.NAME_1;
                     if (name === "Ciudad de Buenos Aires") return null;
