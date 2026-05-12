@@ -317,7 +317,7 @@ export default function Home() {
                 Acceso Clientes
               </a>
               <a
-                href="https://logincor.sytes.net/logincor/ingclientes.asp"
+                href="https://logincor.sytes.net/logincor/trackingweb.asp"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-3 py-2 text-white rounded-sm text-sm font-semibold transition-all hover:opacity-90"
@@ -367,7 +367,7 @@ export default function Home() {
                 Acceso Clientes
               </a>
               <a
-                href="https://logincor.sytes.net/logincor/ingclientes.asp"
+                href="https://logincor.sytes.net/logincor/trackingweb.asp"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white transition-all hover:scale-105"
