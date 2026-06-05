@@ -5,6 +5,7 @@ import SGEHooks from "./components/SGEHooks";
 import SucursalMap from "./components/SucursalMap";
 import ArgentinaMapWrapper from "./components/ArgentinaMapWrapper";
 import { PROVINCE_LOCALITIES } from "@/app/lib/localities";
+import RetiroButton from "./components/RetiroButton";
 
 const sucursales = [
   {
@@ -329,6 +330,7 @@ export default function Home() {
                 </svg>
                 Seguí tu envío
               </a>
+              <RetiroButton variant="nav" />
             </div>
           </nav>
         </header>
@@ -379,6 +381,7 @@ export default function Home() {
                 </svg>
                 Seguí tu envío
               </a>
+              <RetiroButton variant="hero" />
             </div>
           </section>
 
