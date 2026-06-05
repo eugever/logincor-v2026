@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-const API_URL = "http://3.138.85.92:3001/public/solicitar-retiro";
+const API_URL = "/api/solicitar-retiro";
 const BRAND   = "#E94E1B";
 const DARK    = "#02012B";
 
