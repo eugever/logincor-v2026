@@ -6,6 +6,14 @@ const API_URL = "/api/solicitar-retiro";
 const BRAND   = "#E94E1B";
 const DARK    = "#02012B";
 
+const PROVINCIAS = [
+  "Buenos Aires", "CABA", "Catamarca", "Chaco", "Chubut",
+  "Córdoba", "Corrientes", "Entre Ríos", "Formosa", "Jujuy",
+  "La Pampa", "La Rioja", "Mendoza", "Misiones", "Neuquén",
+  "Río Negro", "Salta", "San Juan", "San Luis", "Santa Cruz",
+  "Santa Fe", "Santiago del Estero", "Tierra del Fuego", "Tucumán",
+];
+
 type TipoCarga = "bulto" | "pallet" | "perfil" | "otro" | null;
 
 interface FormState {
@@ -17,10 +25,16 @@ interface FormState {
   horario: string;
   destinatario_nombre: string;
   destinatario_tel: string;
+  dest_calle: string;
+  dest_numero: string;
+  dest_localidad: string;
+  dest_provincia: string;
   tipo_carga: TipoCarga;
   tipo_carga_detalle: string;
+  cantidad: string;
   kg: string;
   dimension_especial: boolean | null;
+  dimension_medidas: string;
   notes: string;
 }
 
@@ -28,8 +42,11 @@ const EMPTY: FormState = {
   remitente_nombre: "", calle: "", numero: "", localidad: "",
   remitente_telefono: "", horario: "",
   destinatario_nombre: "", destinatario_tel: "",
-  tipo_carga: null, tipo_carga_detalle: "", kg: "",
-  dimension_especial: null, notes: "",
+  dest_calle: "", dest_numero: "", dest_localidad: "", dest_provincia: "",
+  tipo_carga: null, tipo_carga_detalle: "",
+  cantidad: "", kg: "",
+  dimension_especial: null, dimension_medidas: "",
+  notes: "",
 };
 
 interface Props {
@@ -43,13 +60,11 @@ export default function RetiroModal({ open, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const [code,    setCode]    = useState("");
 
-  // Bloquear scroll del body cuando está abierto
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  // Cerrar con ESC
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", handler);
@@ -62,6 +77,7 @@ export default function RetiroModal({ open, onClose }: Props) {
     setForm((f) => ({ ...f, [key]: val }));
 
   const validate = (): string | null => {
+    // Remitente
     if (!form.remitente_nombre.trim()) return "Ingresá el nombre o razón social del remitente";
     if (!form.calle.trim())            return "Ingresá la calle";
     if (!form.numero.trim())           return "Ingresá el número";
@@ -71,15 +87,25 @@ export default function RetiroModal({ open, onClose }: Props) {
     if (tel.startsWith("0"))           return "El teléfono del remitente no debe comenzar con 0";
     if (tel.startsWith("15"))          return "El teléfono del remitente no debe comenzar con 15";
     if (!form.horario.trim())          return "Ingresá el horario disponible para el retiro";
+    // Destinatario
     if (!form.destinatario_nombre.trim()) return "Ingresá el nombre o razón social del destinatario";
     const telD = form.destinatario_tel.replace(/\D/g, "");
     if (telD.length !== 10)            return "El teléfono del destinatario debe tener 10 dígitos";
     if (telD.startsWith("0"))          return "El teléfono del destinatario no debe comenzar con 0";
+    if (!form.dest_calle.trim())       return "Ingresá la calle del destinatario";
+    if (!form.dest_numero.trim())      return "Ingresá el número del destinatario";
+    if (!form.dest_localidad.trim())   return "Ingresá la localidad del destinatario";
+    if (!form.dest_provincia.trim())   return "Seleccioná la provincia del destinatario";
+    // Carga
     if (!form.tipo_carga)              return "Seleccioná el tipo de carga";
     if (form.tipo_carga === "otro" && !form.tipo_carga_detalle.trim())
                                        return "Describí el tipo de carga";
+    if (!form.cantidad || parseInt(form.cantidad) <= 0)
+                                       return "Ingresá la cantidad de unidades";
     if (!form.kg || parseFloat(form.kg) <= 0) return "Ingresá el peso en KG";
     if (form.dimension_especial === null) return "Indicá si tiene dimensiones especiales";
+    if (form.dimension_especial && !form.dimension_medidas.trim())
+                                       return "Ingresá las medidas (largo x ancho x alto en metros)";
     return null;
   };
 
@@ -102,10 +128,16 @@ export default function RetiroModal({ open, onClose }: Props) {
           horario:             form.horario.trim(),
           destinatario_nombre: form.destinatario_nombre.trim(),
           destinatario_tel:    form.destinatario_tel.replace(/\D/g, ""),
+          dest_calle:          form.dest_calle.trim(),
+          dest_numero:         form.dest_numero.trim(),
+          dest_localidad:      form.dest_localidad.trim(),
+          dest_provincia:      form.dest_provincia.trim(),
           tipo_carga:          form.tipo_carga,
           tipo_carga_detalle:  form.tipo_carga_detalle.trim() || null,
+          cantidad:            parseInt(form.cantidad),
           kg:                  parseFloat(form.kg),
           dimension_especial:  form.dimension_especial,
+          dimension_medidas:   form.dimension_especial ? form.dimension_medidas.trim() : null,
           notes:               form.notes.trim() || null,
         }),
       });
@@ -311,7 +343,7 @@ export default function RetiroModal({ open, onClose }: Props) {
                 <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: BRAND }}>
                   🎯 Datos del destinatario
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                   <div>
                     <label className="block text-xs text-zinc-400 mb-1">
                       Nombre o razón social <span style={{ color: BRAND }}>*</span>
@@ -335,6 +367,57 @@ export default function RetiroModal({ open, onClose }: Props) {
                       onChange={(e) => set("destinatario_tel", e.target.value.replace(/\D/g, ""))}
                     />
                   </div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs text-zinc-400 mb-1">
+                      Calle <span style={{ color: BRAND }}>*</span>
+                    </label>
+                    <input
+                      className={inputCls} style={inputStyle}
+                      placeholder="Av. Colón"
+                      value={form.dest_calle}
+                      onChange={(e) => set("dest_calle", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-400 mb-1">
+                      Número <span style={{ color: BRAND }}>*</span>
+                    </label>
+                    <input
+                      className={inputCls} style={inputStyle}
+                      placeholder="500"
+                      value={form.dest_numero}
+                      onChange={(e) => set("dest_numero", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-zinc-400 mb-1">
+                      Localidad <span style={{ color: BRAND }}>*</span>
+                    </label>
+                    <input
+                      className={inputCls} style={inputStyle}
+                      placeholder="Rosario"
+                      value={form.dest_localidad}
+                      onChange={(e) => set("dest_localidad", e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <label className="block text-xs text-zinc-400 mb-1">
+                    Provincia <span style={{ color: BRAND }}>*</span>
+                  </label>
+                  <select
+                    className={inputCls}
+                    style={{ ...inputStyle, appearance: "none" }}
+                    value={form.dest_provincia}
+                    onChange={(e) => set("dest_provincia", e.target.value)}
+                  >
+                    <option value="" disabled>Seleccioná una provincia</option>
+                    {PROVINCIAS.map((p) => (
+                      <option key={p} value={p} style={{ background: DARK }}>{p}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -377,7 +460,18 @@ export default function RetiroModal({ open, onClose }: Props) {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs text-zinc-400 mb-1">
+                      Cantidad <span style={{ color: BRAND }}>*</span>
+                    </label>
+                    <input
+                      className={inputCls} style={inputStyle}
+                      type="number" min="1" step="1" placeholder="Ej: 3"
+                      value={form.cantidad}
+                      onChange={(e) => set("cantidad", e.target.value)}
+                    />
+                  </div>
                   <div>
                     <label className="block text-xs text-zinc-400 mb-1">
                       Peso en KG <span style={{ color: BRAND }}>*</span>
@@ -391,14 +485,29 @@ export default function RetiroModal({ open, onClose }: Props) {
                   </div>
                   <div>
                     <label className="block text-xs text-zinc-400 mb-2">
-                      ¿Tiene dimensiones especiales? <span style={{ color: BRAND }}>*</span>
+                      ¿Dimensiones especiales? <span style={{ color: BRAND }}>*</span>
                     </label>
                     <div className="flex gap-2">
                       <RadioBtn label="Sí"  active={form.dimension_especial === true}  onClick={() => set("dimension_especial", true)} />
-                      <RadioBtn label="No"  active={form.dimension_especial === false} onClick={() => set("dimension_especial", false)} />
+                      <RadioBtn label="No"  active={form.dimension_especial === false} onClick={() => { set("dimension_especial", false); set("dimension_medidas", ""); }} />
                     </div>
                   </div>
                 </div>
+
+                {form.dimension_especial === true && (
+                  <div className="mb-4">
+                    <label className="block text-xs text-zinc-400 mb-1">
+                      Medidas <span style={{ color: BRAND }}>*</span>{" "}
+                      <span className="text-zinc-600">(largo x ancho x alto, en metros)</span>
+                    </label>
+                    <input
+                      className={inputCls} style={inputStyle}
+                      placeholder="Ej: 2.5 x 1.2 x 1.8"
+                      value={form.dimension_medidas}
+                      onChange={(e) => set("dimension_medidas", e.target.value)}
+                    />
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-xs text-zinc-400 mb-1">
