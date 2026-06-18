@@ -1,4 +1,5 @@
 import Image from "next/image";
+import LogoAcceso from "./components/LogoAcceso";
 import Script from "next/script";
 import GaleriaCarrusel from "./components/GaleriaCarrusel";
 import SGEHooks from "./components/SGEHooks";
@@ -293,13 +294,7 @@ export default function Home() {
         <header className="border-b px-6 py-4" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
           <nav className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center">
-              <Image
-                src="/logo.svg"
-                alt="Logincor - Transporte y Logística Industrial"
-                width={220}
-                height={50}
-                priority
-              />
+              <LogoAcceso />
             </div>
             <div className="hidden md:flex items-center gap-6 text-sm text-zinc-400">
               <a href="#servicios" className="hover:text-white transition-colors">Servicios</a>
