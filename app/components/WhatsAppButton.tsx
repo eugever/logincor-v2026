@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { track } from "@/app/lib/tracking";
 
-const WA_MSG = encodeURIComponent("Hola, me gustaría consultar sobre un envío con LOGINCOR.");
+
 
 const CONTACTS = [
   { name: "Germán", number: "5493517078383" },
@@ -21,7 +21,7 @@ export default function WhatsAppButton() {
           {CONTACTS.map((contact) => (
             <a
               key={contact.number}
-              href={`https://wa.me/${contact.number}?text=${WA_MSG}`}
+              href={`https://wa.me/${contact.number}?text=${encodeURIComponent(`Hola ${contact.name}, me gustaría consultar sobre un envío con LOGINCOR.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
