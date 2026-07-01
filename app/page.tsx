@@ -574,7 +574,7 @@ export default function Home() {
                 <div className="flex gap-3 flex-shrink-0">
                   <a
                     id="cta-llamar"
-                    href="tel:+54351000000"
+                    href="tel:+543517000710"
                     className="px-6 py-3 font-bold rounded-sm text-sm transition-opacity hover:opacity-90"
                     style={{ background: '#fff', color: brand.secondary }}
                   >

@@ -9,13 +9,18 @@ interface Props {
   onClose: () => void;
 }
 
-const WHATSAPP_NUMBER = "543513117484";
+const CONTACTS = [
+  { name: "Germán", number: "5493517078383" },
+  { name: "Gastón", number: "5493516835089" },
+  { name: "Emilia", number: "5493513286471" },
+];
 
 export default function CotizarModal({ localidad, salidas, entrega, onClose }: Props) {
   const [step, setStep] = useState<"info" | "form">("info");
   const [form, setForm] = useState({
     origen: "",
     carga: "",
+    comercial: "5493517078383",
     valor: "",
     peso: "",
     alto: "",
@@ -63,7 +68,7 @@ export default function CotizarModal({ localidad, salidas, entrega, onClose }: P
       `Por favor contáctarme para confirmar la cotización. ¡Gracias!`,
     ].join("\n");
 
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
+    window.open(`https://wa.me/${form.comercial}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
   const isFormValid = Object.values(form).every((v) => v.trim() !== "");
@@ -131,6 +136,27 @@ export default function CotizarModal({ localidad, salidas, entrega, onClose }: P
                   <div className="text-zinc-500 text-xs">{sub}</div>
                 </div>
               ))}
+            </div>
+
+            {/* Selector de comercial */}
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-mono uppercase tracking-widest text-zinc-400">¿Con quién querés hablar?</p>
+              <div className="grid grid-cols-3 gap-2">
+                {CONTACTS.map((c) => (
+                  <button
+                    key={c.number}
+                    onClick={() => setForm((f) => ({ ...f, comercial: c.number }))}
+                    className="py-2 rounded-xl text-sm font-semibold transition-all"
+                    style={{
+                      background: form.comercial === c.number ? "#25D366" : "rgba(255,255,255,0.06)",
+                      color: form.comercial === c.number ? "#fff" : "rgba(255,255,255,0.5)",
+                      border: form.comercial === c.number ? "none" : "1px solid rgba(255,255,255,0.1)",
+                    }}
+                  >
+                    {c.name}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <button

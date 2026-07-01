@@ -63,12 +63,21 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_AR",
     url: "https://logincor.com.ar",
+    images: [
+      {
+        url: "https://logincor.com.ar/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "LOGINCOR — Transporte Buenos Aires Córdoba en 24hs",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "LOGINCOR | Transporte Buenos Aires → Córdoba en 24hs",
     description:
       "Envíos 24hs puerta a puerta. Seguimiento Satelital, Plataforma Hidráulica y avisos por WhatsApp en cada etapa del envío.",
+    images: ["https://logincor.com.ar/og-image.jpg"],
   },
   robots: {
     index: true,

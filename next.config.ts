@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Source maps en producción — corrige el error "DevTools failed to load source map"
-  productionBrowserSourceMaps: true,
-
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
