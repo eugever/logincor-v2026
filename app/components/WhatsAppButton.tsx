@@ -8,6 +8,7 @@ import { track } from "@/app/lib/tracking";
 const CONTACTS = [
   { name: "Germán", number: "5493517078383" },
   { name: "Gastón", number: "5493516835089" },
+  { name: "Emilia", number: "5493513286471" },
 ];
 
 export default function WhatsAppButton() {
